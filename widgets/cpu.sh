@@ -11,7 +11,7 @@ declare -r CPU_ARRAY=($(awk '/MHz/{print $4}' /proc/cpuinfo | cut -f1 -d"."))
 # Number of logical CPU
 readonly NUM_OF_CPUS="${#CPU_ARRAY[@]}"
 # Tempretature
-readonly CPU_TEMP="$(sensors | grep -A 0 SMBUSMASTER | cut -f2- -d: | sed "s/[^0-9'.]//g")"
+readonly CPU_TEMP="$(sensors | grep -A 5 amdgpu-pci-0400 | grep edge | cut -d$':' -f2 | tr -d ' ')"
 
 # Tooltip
 MORE_INFO="<tool>"
@@ -24,7 +24,7 @@ for CPU in "${CPU_ARRAY[@]}"; do
   MORE_INFO+="├─ CPU ${STEP}:\t\t\t\t  ${CPU} MHz\n"
   let STEP+=1
 done
-MORE_INFO+="└─ Temperature:\t\t  ${CPU_TEMP}°C"
+MORE_INFO+="└─ Temperature:\t\t  ${CPU_TEMP}"
 MORE_INFO+="</tool>"
 STDOUT=$(( STDOUT / NUM_OF_CPUS )) # calculate average clock speed
 STDOUT=$(awk '{$1 = $1 / 1024; printf "%.2f%s", $1, "GHz"}' <<< "${STDOUT}")
@@ -40,7 +40,7 @@ else
   INFO="<txt>"
 fi
 INFO+="${STDOUT}"
-INFO+=" - $CPU_TEMP"°C"  "
+INFO+=" - $CPU_TEMP  "
 INFO+="</txt>"
 
 # Output panel
